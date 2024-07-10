@@ -1,5 +1,6 @@
 package com.tujuhsembilan.example.controller;
 
+import java.security.Principal;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
@@ -11,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.tujuhsembilan.example.controller.dto.NoteDto;
+import com.tujuhsembilan.example.dto.NoteDto;
 import com.tujuhsembilan.example.model.Note;
 import com.tujuhsembilan.example.repository.NoteRepo;
 
@@ -27,17 +28,20 @@ public class NoteController {
   private final ModelMapper mdlMap;
 
   @GetMapping
-  public ResponseEntity<?> getNotes() {
+  public ResponseEntity<?> getNotes(Principal principal) {
+    String username = principal.getName();
     return ResponseEntity
-        .ok(repo.findAll()
+        .ok(repo.findByUsername(username)
             .stream()
             .map(o -> mdlMap.map(o, NoteDto.class))
             .collect(Collectors.toSet()));
   }
 
   @PostMapping
-  public ResponseEntity<?> saveNote(@RequestBody NoteDto body) {
+  public ResponseEntity<?> saveNote(@RequestBody NoteDto body, Principal principal) {
+    String username = principal.getName();
     var newNote = mdlMap.map(body, Note.class);
+    newNote.setUsername(username);
     newNote = repo.save(newNote);
     return ResponseEntity.status(HttpStatus.CREATED).body(newNote);
   }

@@ -1,4 +1,4 @@
-package com.tujuhsembilan.example.controller.dto;
+package com.tujuhsembilan.example.dto;
 
 import java.util.UUID;
 
